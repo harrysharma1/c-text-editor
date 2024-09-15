@@ -10,8 +10,11 @@
 #define CTRL_KEY(k) ((k) & 0x1f)
 
 /* Data  */
-struct termios originTermios;
+struct editor_config {
+	struct termios origin_termios;
+};
 
+struct editor_config E;
 /* Terminal  */
 void killed(const char *s){
 	perror(s);
@@ -20,13 +23,13 @@ void killed(const char *s){
 
 
 void raw_mode_disabled(){
-	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &originTermios) == -1) killed("tcsetattr");
+	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.origin_termios) == -1) killed("tcsetattr");
 }
 
 void raw_mode_enabled(){
-	if (tcgetattr(STDIN_FILENO, &originTermios) == -1) killed("tcgetattr");
+	if (tcgetattr(STDIN_FILENO, &E.origin_termios) == -1) killed("tcgetattr");
 	atexit(raw_mode_disabled);
-	struct termios raw = originTermios;
+	struct termios raw = E.origin_termios;
 	raw.c_oflag &= ~(OPOST);
 	raw.c_iflag &= ~(IXON | ICRNL | BRKINT | INPCK | ISTRIP);
 	raw.c_cflag |= (CS8);
