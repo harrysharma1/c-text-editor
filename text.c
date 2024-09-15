@@ -37,7 +37,7 @@ void raw_mode_enabled(){
 }
 
 
-char editor_read_key() {
+char editor_read_key(){
 	int nread;
 	char c;
 	while ((nread = read(STDIN_FILENO, &c,1)) != 1){
@@ -47,6 +47,7 @@ char editor_read_key() {
 	return c;
 }
 
+/* Input  */
 void editor_keypress_process(){
 	char c = editor_read_key();
 
@@ -57,12 +58,18 @@ void editor_keypress_process(){
 	}
 }
 
+/* Output  */
+void editor_refresh_screen(){
+	write(STDOUT_FILENO, "\x1b[2J", 4);
+}
+
 /* Init */
 int main()
 {
 	raw_mode_enabled();
 	char c;
 	while (1) {
+		editor_refresh_screen();
 		editor_keypress_process();
 		char c = '\0';
 		if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) killed("read");
